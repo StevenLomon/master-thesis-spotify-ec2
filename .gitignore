@@ -14,8 +14,8 @@ spotify-airflow-env/
 # Ignore everything in the airflow directory
 airflow/*
 
-# But do not ignore the dags directory inside airflow
+# Do not ignore the dags directory within airflow
 !airflow/dags
 
 # Do not ignore files within the dags directory
-airflow/dags/*
+!airflow/dags/*
