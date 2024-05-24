@@ -2,7 +2,6 @@
 .cache
 .ssh
 .vscode-server
-airflow/
 spotify-airflow-env/
 .bash_history
 .bash_logout
@@ -11,3 +10,12 @@ spotify-airflow-env/
 .sudo_as_admin_successful
 .wget-hsts
 .dotnet
+
+# Ignore everything in the airflow directory
+airflow/*
+
+# But do not ignore the dags directory inside airflow
+!airflow/dags
+
+# Do not ignore files within the dags directory
+airflow/dags/*
