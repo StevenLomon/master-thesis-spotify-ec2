@@ -1,0 +1,13 @@
+.aws
+.cache
+.ssh
+.vscode-server
+airflow/
+spotify-airflow-env/
+.bash_history
+.bash_logout
+.bashrc
+.profile
+.sudo_as_admin_successful
+.wget-hsts
+
