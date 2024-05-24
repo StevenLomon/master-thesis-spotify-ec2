@@ -27,5 +27,5 @@ with DAG('spotify_etl_dag',
     
         extract_spotify_data = PythonOperator(
             task_id= 'tsk_extract_spotify_data',
-            python_callable=extract_data
+            # python_callable=extract_data
         )
