@@ -10,7 +10,8 @@ s3_client = boto3.client('s3')
 target_bucket_name = 'spotify-airflow-bucket'
 
 def extract_data():
-    df = extract_raw_playlist_data()
+    raw_playlist_data = extract_raw_playlist_data()
+    df = pd.DataFrame(raw_playlist_data['playlists']['items'])
     now = datetime.now()
     date_now_string = now.strftime('%Y-%m-%d')
     file_str = f"spotify_playlist_raw_data_{date_now_string}"
@@ -26,7 +27,7 @@ def transform_data(task_instance):
     clean_playlist_data = transform_raw_playlist_data(df)
     final_clean_data = transform_data_final(clean_playlist_data)
 
-    # Convert DataFrame to CSV format
+    # Convert DataFrames to CSV and parquet format
     csv_data = clean_playlist_data.to_csv(index=False)
     parquet_data = final_clean_data.to_parquet(index=False)
 
@@ -59,6 +60,3 @@ default_args = {
 #             task_id= 'tsk_extract_spotify_data',
 #             # python_callable=extract_data
 #         )
-
-# df = extract_raw_playlist_data()
-# print(df)

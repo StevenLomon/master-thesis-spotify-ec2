@@ -20,8 +20,7 @@ def extract_raw_playlist_data():
     d = r.json()
 
     # RAW DATA FOR THE 50 PLAYLISTS
-    df = pd.DataFrame(d['playlists']['items'])
-    return df
+    return d
 
 def transform_raw_playlist_data(raw_playlist_data):
     refined_playlists = []
