@@ -39,6 +39,10 @@ def transform_data(task_instance):
     object_key = f"{object_key}.parquet"
     s3_client.put_object(Bucket=target_bucket_name, Key=object_key, Body=parquet_data)
 
+    # Return refined_tracks.json to be uploaded to S3 via BashOperator
+    file_str = "refined_tracks.json"
+    output_file_path = f"/home/ubuntu/{file_str}"
+    return [output_file_path, file_str]
 
 default_args = {
     'owner': 'airflow',
@@ -51,12 +55,29 @@ default_args = {
     'retry_delay': timedelta(seconds=15)
 }
 
-# with DAG('spotify_etl_dag',
-#          default_args=default_args,
-#          # schedule_interval = @weekly,
-#          catchup=False) as dag:
+with DAG('spotify_etl_dag',
+         default_args=default_args,
+         # schedule_interval = @weekly,
+         catchup=False) as dag:
     
-#         extract_spotify_data = PythonOperator(
-#             task_id= 'tsk_extract_spotify_data',
-#             # python_callable=extract_data
-#         )
+        extract_spotify_data = PythonOperator(
+            task_id= 'tsk_extract_spotify_data',
+            python_callable=extract_data
+        )
+
+        transform_spotify_data = PythonOperator(
+             task_id= 'tsk_transform_spotify_data',
+             python_callable=transform_data
+        )
+
+        load_json_intermediate_data_to_s3 = BashOperator(
+             task_id= 'tsk_load_json_intermediate_data_to_s3',
+             bash_command= 'aws s3 mv {{ ti.xcom_pull("tsk_extract_ikea_data")[0]}} s3://spotify-airflow-bucket'
+        )
+
+        load_raw_data_to_s3 = BashOperator(
+             task_id= 'tsk_load_raw_data_to_s3',
+             bash_command= 'aws s3 mv {{ ti.xcom_pull("tsk_extract_ikea_data")[0]}} s3://spotify-airflow-bucket-raw-data'
+        )
+
+        extract_spotify_data >> transform_spotify_data >> load_json_intermediate_data_to_s3 >> load_raw_data_to_s3
