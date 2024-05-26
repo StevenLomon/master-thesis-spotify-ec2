@@ -1,4 +1,4 @@
-import boto3
+import boto3, fastparquet
 import pandas as pd
 from airflow import DAG
 from datetime import datetime, timedelta
