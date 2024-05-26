@@ -1,10 +1,9 @@
-import boto3, fastparquet
+import boto3
 import pandas as pd
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
-from io import BytesIO
 from spotify_etl import extract_raw_playlist_data, transform_raw_playlist_data, transform_data_final
 
 s3_client = boto3.client('s3')
