@@ -7,7 +7,7 @@ from airflow.operators.bash import BashOperator
 from spotify_etl import extract_raw_playlist_data, transform_raw_playlist_data, transform_data_final
 
 s3_client = boto3.client('s3')
-target_bucket_name = 'spotify-airflow-bucket'
+target_bucket_name = 'spotify-airflow-etl-bucket'
 
 def extract_data():
     raw_playlist_data = extract_raw_playlist_data()
@@ -72,12 +72,12 @@ with DAG('spotify_etl_dag',
 
         load_json_intermediate_data_to_s3 = BashOperator(
              task_id= 'tsk_load_json_intermediate_data_to_s3',
-             bash_command= 'aws s3 mv {{ ti.xcom_pull("tsk_extract_ikea_data")[0]}} s3://spotify-airflow-bucket'
+             bash_command= f'aws s3 mv {{ ti.xcom_pull("tsk_extract_ikea_data")[0]}} s3://{target_bucket_name}'
         )
 
         load_raw_data_to_s3 = BashOperator(
              task_id= 'tsk_load_raw_data_to_s3',
-             bash_command= 'aws s3 mv {{ ti.xcom_pull("tsk_extract_ikea_data")[0]}} s3://spotify-airflow-bucket-raw-data'
+             bash_command= 'aws s3 mv {{ ti.xcom_pull("tsk_extract_ikea_data")[0]}} s3://spotify-airflow-etl-bucket-raw'
         )
 
         extract_spotify_data >> transform_spotify_data >> load_json_intermediate_data_to_s3 >> load_raw_data_to_s3
