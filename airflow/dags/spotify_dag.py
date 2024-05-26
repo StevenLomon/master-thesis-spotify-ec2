@@ -4,7 +4,7 @@ from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
-from spotify_etl import extract_raw_playlist_data, transform_raw_playlist_data, transform_data_final
+from spotify_etl import extract_raw_playlist_data, transform_raw_playlist_data
 
 s3_client = boto3.client('s3')
 target_bucket_name = 'spotify-airflow-etl-bucket'
@@ -14,13 +14,13 @@ def extract_data():
     df = pd.DataFrame(raw_playlist_data['tracks']['items'])
     now = datetime.now()
     date_now_string = now.strftime('%Y-%m-%d')
-    file_str = f"spotify_global50_raw_data_{date_now_string}"
+    file_str = f"spotify_global50_data_{date_now_string}"
     df.to_csv(f"{file_str}.csv", index=False)
     output_file_path = f"/home/ubuntu/{file_str}.csv"
-    return [output_file_path, file_str]
+    return [output_file_path, file_str, raw_playlist_data]
 
 def transform_data(task_instance):
-    data = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[0]
+    data = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[2]
     object_key_base = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[1]
 
     clean_global50_data = transform_raw_playlist_data(data)
