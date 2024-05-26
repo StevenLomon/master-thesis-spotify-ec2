@@ -24,7 +24,6 @@ def extract_raw_playlist_data():
 
 def transform_raw_playlist_data(raw_playlist_data):
     refined_playlists = []
-    print(f"Raw data: {raw_playlist_data}")
     for playlist in raw_playlist_data['playlists']['items']:
         refined_playlists.append({'id': playlist['id'], 'name': playlist['name'],
                                 'description': playlist['description'],

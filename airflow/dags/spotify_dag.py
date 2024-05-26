@@ -22,7 +22,8 @@ def extract_data():
 
 def transform_data(task_instance):
     data = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[2]
-    object_key = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[1]
+    object_key_base = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[1]
+    print("Data and object_key_base pulled from XCom:", data, object_key_base)
 
     clean_playlist_data = transform_raw_playlist_data(data)
     final_clean_data = transform_data_final(clean_playlist_data)
@@ -33,15 +34,19 @@ def transform_data(task_instance):
     # Convert DataFrames to Parquet format and store in memory buffer
     parquet_buffer = BytesIO()
     final_clean_data.to_parquet(parquet_buffer, index=False)
+    print("Parquet buffer created")
+
     parquet_buffer.seek(0)  # Rewind the buffer
+    print("Parquet buffer seek done")
 
     # Upload CSV to S3
-    object_key = f"{object_key}.csv"
+    object_key = f"{object_key_base}.csv"
     s3_client.put_object(Bucket=target_bucket_name, Key=object_key, Body=csv_data)
 
     # Upload paruqet to S3
     object_key = f"spotify_data_final.parquet"
     s3_client.put_object(Bucket=target_bucket_name, Key=object_key, Body=parquet_buffer.getvalue())
+    print("Parquet uploaded to S3")
 
     # Return refined_tracks.json to be uploaded to S3 via BashOperator
     file_str = "refined_tracks.json"
