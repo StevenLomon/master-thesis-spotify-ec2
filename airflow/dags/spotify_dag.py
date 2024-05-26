@@ -72,12 +72,12 @@ with DAG('spotify_etl_dag',
 
         load_json_intermediate_data_to_s3 = BashOperator(
              task_id= 'tsk_load_json_intermediate_data_to_s3',
-             bash_command= f'aws s3 mv {{ ti.xcom_pull("tsk_extract_ikea_data")[0]}} s3://{target_bucket_name}'
+             bash_command= f'aws s3 mv {{ ti.xcom_pull("tsk_extract_spotify_data")[0]}} s3://{target_bucket_name}'
         )
 
         load_raw_data_to_s3 = BashOperator(
              task_id= 'tsk_load_raw_data_to_s3',
-             bash_command= 'aws s3 mv {{ ti.xcom_pull("tsk_extract_ikea_data")[0]}} s3://spotify-airflow-etl-bucket-raw'
+             bash_command= 'aws s3 mv {{ ti.xcom_pull("tsk_extract_spotify_data")[0]}} s3://spotify-airflow-etl-bucket-raw'
         )
 
         extract_spotify_data >> transform_spotify_data >> load_json_intermediate_data_to_s3 >> load_raw_data_to_s3

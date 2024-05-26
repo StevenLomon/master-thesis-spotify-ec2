@@ -10,6 +10,7 @@ spotify-airflow-env/
 .sudo_as_admin_successful
 .wget-hsts
 .dotnet
+*.csv
 
 # Ignore everything in the airflow directory
 airflow/*
