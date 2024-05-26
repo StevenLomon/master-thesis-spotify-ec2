@@ -12,14 +12,19 @@ headers = get_headers()
 BASE_URL = 'https://api.spotify.com/v1/'
 
 def extract_raw_playlist_data():
-    # get the 50 most popular featured playlists in Sweden right now
-    r = requests.get(BASE_URL + 'browse/featured-playlists',
+    # get raw data for the 50 songs in the Spotify Global Top 50 playlist
+    q = requests.get(BASE_URL + 'search',
                     headers=headers,
-                    params={'q': 'top%20%20tracks', 'type': 'playlist',
-                            'market': 'SE', 'limit': 50})
-    d = r.json()
+                    params={'q': 'global%2520top%252050', 'type': 'playlist',
+                            'market': 'SE', 'limit': 1})
+    d = q.json()
+    global_top_50_id = d['playlists']['items'][0]['id']
+    global_top_50_id
 
-    # RAW DATA FOR THE 50 PLAYLISTS
+    r = requests.get(BASE_URL + f'playlists/{global_top_50_id}',
+                    headers=headers,
+                    params={'market': 'SE'})
+    d = r.json()
     return d
 
 def transform_raw_playlist_data(raw_playlist_data):
