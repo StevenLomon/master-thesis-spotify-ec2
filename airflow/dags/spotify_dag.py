@@ -20,8 +20,8 @@ def extract_data():
     return [output_file_path, file_str]
 
 def transform_data(task_instance):
-    data = task_instance.xcom_pull(task_ids='tsk_extract_ikea_data')[0]
-    object_key = task_instance.xcom_pull(task_ids='tsk_extract_ikea_data')[1]
+    data = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[0]
+    object_key = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[1]
     df = pd.read_csv(data)
 
     clean_playlist_data = transform_raw_playlist_data(df)
