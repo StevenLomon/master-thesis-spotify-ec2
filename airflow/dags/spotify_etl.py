@@ -24,6 +24,7 @@ def extract_raw_playlist_data():
 
 def transform_raw_playlist_data(raw_playlist_data):
     refined_playlists = []
+    print(f"Raw data: {raw_playlist_data}")
     for playlist in raw_playlist_data['playlists']['items']:
         refined_playlists.append({'id': playlist['id'], 'name': playlist['name'],
                                 'description': playlist['description'],
@@ -85,7 +86,7 @@ def extract_track_info(track_info, playlist_id, playlist_name, headers, session)
         'time signature': responses['audio_features'].get('time_signature')
     }
 
-def get_refined_tracks(df, headers, num_rows=None, resume_from=None, save_interval=2, save_path='f"/home/ubuntu/refined_tracks.json'):
+def get_refined_tracks(df, headers, num_rows=None, resume_from=None, save_interval=2, save_path=f'/home/ubuntu/refined_tracks.json'):
     refined_tracks = []
 
     try:

@@ -17,14 +17,13 @@ def extract_data():
     file_str = f"spotify_playlist_raw_data_{date_now_string}"
     df.to_csv(f"{file_str}.csv", index=False)
     output_file_path = f"/home/ubuntu/{file_str}.csv"
-    return [output_file_path, file_str]
+    return [output_file_path, file_str, raw_playlist_data]
 
 def transform_data(task_instance):
-    data = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[0]
-    object_key = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[1]
-    df = pd.read_csv(data)
+    data = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[2]
+    # object_key = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[1]
 
-    clean_playlist_data = transform_raw_playlist_data(df)
+    clean_playlist_data = transform_raw_playlist_data(data)
     final_clean_data = transform_data_final(clean_playlist_data)
 
     # Convert DataFrames to CSV and parquet format
