@@ -4,6 +4,7 @@ from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
+from io import BytesIO
 from spotify_etl import extract_raw_playlist_data, transform_raw_playlist_data, transform_data_final
 
 s3_client = boto3.client('s3')
@@ -21,22 +22,26 @@ def extract_data():
 
 def transform_data(task_instance):
     data = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[2]
-    # object_key = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[1]
+    object_key = task_instance.xcom_pull(task_ids='tsk_extract_spotify_data')[1]
 
     clean_playlist_data = transform_raw_playlist_data(data)
     final_clean_data = transform_data_final(clean_playlist_data)
 
-    # Convert DataFrames to CSV and parquet format
+    # Convert DataFrame to CSV format
     csv_data = clean_playlist_data.to_csv(index=False)
-    parquet_data = final_clean_data.to_parquet(index=False)
+
+    # Convert DataFrames to Parquet format and store in memory buffer
+    parquet_buffer = BytesIO()
+    final_clean_data.to_parquet(parquet_buffer, index=False)
+    parquet_buffer.seek(0)  # Rewind the buffer
 
     # Upload CSV to S3
     object_key = f"{object_key}.csv"
     s3_client.put_object(Bucket=target_bucket_name, Key=object_key, Body=csv_data)
 
     # Upload paruqet to S3
-    object_key = f"{object_key}.parquet"
-    s3_client.put_object(Bucket=target_bucket_name, Key=object_key, Body=parquet_data)
+    object_key = f"spotify_data_final.parquet"
+    s3_client.put_object(Bucket=target_bucket_name, Key=object_key, Body=parquet_buffer.getvalue())
 
     # Return refined_tracks.json to be uploaded to S3 via BashOperator
     file_str = "refined_tracks.json"
