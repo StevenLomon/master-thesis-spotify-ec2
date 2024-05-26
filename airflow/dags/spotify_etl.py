@@ -85,7 +85,7 @@ def extract_track_info(track_info, playlist_id, playlist_name, headers, session)
         'time signature': responses['audio_features'].get('time_signature')
     }
 
-def get_refined_tracks(df, headers, num_rows=None, resume_from=None, save_interval=2, save_path='refined_tracks.json'):
+def get_refined_tracks(df, headers, num_rows=None, resume_from=None, save_interval=2, save_path='f"/home/ubuntu/refined_tracks.json'):
     refined_tracks = []
 
     try:
